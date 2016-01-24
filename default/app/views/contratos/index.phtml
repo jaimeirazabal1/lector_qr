@@ -1,0 +1,69 @@
+<div id="page-wrapper">
+	<div class="row">
+		<h1>Lista de Contratos</h1>
+		<?php View::content() ?>
+		<div class="col-lg-12">
+                    <div class="panel panel-default">
+                        
+                        <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <div class="dataTable_wrapper">
+                                <table class="table table-striped table-bordered table-hover" id="dataTables-example">
+                                    <thead>
+                                        <tr>
+                                            <th>Id</th>
+                                            <th>Creado</th>
+                                            <th>Empresa</th>
+                                            <th>Preforma</th>
+                                            <th>Descripcion</th>
+                                            <th>Contrato</th>
+                                            <th>Creado</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    	<?php foreach ($contratos as $key => $value): ?>
+                                    		
+	                                        <tr class="odd gradeX">
+	                                            <td class="center"><?php echo $value->id ?></td>
+	                                            <td class="center"><?php echo Load::model("usuarios")->get_nombre_by_id($value->creado_por) ?></td>
+	                                            <td class="center"><?php echo Load::model("usuarios")->get_nombre_by_id($value->pertenece_a) ?></td>
+	                                            <td class="center"><?php echo $value->numero_preforma ?></td>
+	                                            <td class="center"><?php echo $value->descripcion ?></td>
+	                                       		<td class="center"><?php echo Html::link("contratos/ver/{$value->id}","Ver Contrato") ?></td>
+	                                            <td class="center"><?php echo $value->created ?></td>
+	                                          <td class="center">
+	                                          	<div class="btn-group" role="group" aria-label="...">
+	                                          		<?php echo Html::link("documentos/subir/{$value->id}","Subir Documento","class='btn btn-default'") ?>
+	                                          		<?php echo Html::link("contratos/edit/{$value->id}","",'class="glyphicon glyphicon-edit btn btn-default"') ?>
+	                                          		<?php echo Js::link("contratos/del/{$value->id}","","Esta Seguro?",'glyphicon glyphicon-remove btn btn-default') ?>
+												</div>
+	                                          </td>
+	                                        </tr>
+                                    	<?php endforeach ?>
+                                       
+                            
+                                    </tbody>
+                                </table>
+                            </div>
+                      
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+		</div>	
+	</div>
+</div>
+    <script src="<?php echo PUBLIC_PATH ?>bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
+    <script src="<?php echo PUBLIC_PATH ?>bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="<?php echo PUBLIC_PATH ?>dist/js/sb-admin-2.js"></script>
+	<?php echo Tag::js("jquery/jquery.kumbiaphp") ?>
+    <!-- Page-Level Demo Scripts - Tables - Use for reference -->
+    <script>
+    $(document).ready(function() {
+        $('#dataTables-example').DataTable({
+                responsive: true
+        });
+    });
+    </script>

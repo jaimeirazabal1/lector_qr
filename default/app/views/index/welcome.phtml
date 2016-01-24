@@ -1,0 +1,242 @@
+
+<?php echo Tag::js("qr_code/lib/jsqrcode-combined.min") ?>
+<?php echo Tag::js("qr_code/src/html5-qrcode") ?>
+
+<?php echo Tag::css("jquery-ui") ?>
+<?php echo Tag::js("jquery-ui.min") ?>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		
+		$('#reader').html5_qrcode(function(data){
+				var fecha = getDateFormated();
+		   
+		        guardar(data,fecha);
+		    },
+		    function(error){
+		    	console.log(error);
+		        //alert("Ocurrió un error capturando el código, Contacte con el administrador");
+		        //show read errors 
+		    }, function(videoError){
+		    	console.log(videoError)
+		        //alert("Ocurrió un error capturando el video, Contacte con el administrador");
+		    }
+		);
+		$("body").on("click",".boton_borrar",function(){
+			var id = $(this).attr("id");
+			var self = $(this);
+			cargando(1);
+
+			if (confirm("Estas seguro?")) {
+				$.ajax({
+					url:"/qr_code/"+"escaner/borrar/"+id,
+					success:function(r){
+						cargando(0);
+
+						if (r.response) {
+							self.parent().remove();
+						}else{
+							alert("Ocurrió un error borrando el registro");
+						}
+					}					
+				})
+			};
+		});
+		
+		getRegistros();
+
+	    $.datepicker.regional['es'] = {
+	        closeText: 'Cerrar',
+	        prevText: '<Ant',
+	        nextText: 'Sig>',
+	        currentText: 'Hoy',
+	        monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+	        monthNamesShort: ['Ene','Feb','Mar','Abr', 'May','Jun','Jul','Ago','Sep', 'Oct','Nov','Dic'],
+	        dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+	        dayNamesShort: ['Dom','Lun','Mar','Mié','Juv','Vie','Sáb'],
+	        dayNamesMin: ['Do','Lu','Ma','Mi','Ju','Vi','Sá'],
+	        weekHeader: 'Sm',
+	        dateFormat: 'dd/mm/yy',
+	        firstDay: 1,
+	        isRTL: false,
+	        showMonthAfterYear: false,
+	        yearSuffix: ''
+	    };
+    	$.datepicker.setDefaults($.datepicker.regional['es']);
+
+		$(".datepicker").datepicker({
+			dateFormat:'dd-mm-yy',
+			changeMonth: true,
+      		changeYear: true
+		});
+		$("#desde").change(function(){
+			console.log($(this).val())
+			if ($("#hasta").val()) {
+				var href = $("#btn-exportar").attr("href");
+				$("#btn-exportar").attr("href","/qr_code/"+"escaner/exportar?"+"desde="+$("#desde").val()+"&hasta="+$("#hasta").val())
+			}else{
+				var href = $("#btn-exportar").attr("href");
+				$("#btn-exportar").attr("href","/qr_code/"+"escaner/exportar?"+"desde="+$("#desde").val())
+			}
+		})
+		$("#hasta").change(function(){
+			console.log($(this).val())
+			if ($("#desde").val()) {
+				var href = $("#btn-exportar").attr("href");
+				$("#btn-exportar").attr("href","/qr_code/"+"escaner/exportar?"+"desde="+$("#desde").val()+"&hasta="+$("#hasta").val())
+			}else{
+				var href = $("#btn-exportar").attr("href");
+				$("#btn-exportar").attr("href","/qr_code/"+"escaner/exportar?"+"hasta="+$("#hasta").val())
+			}
+		})
+		$("body").on("click","#btn-buscar",function(){
+			var fecha1 = $("#desde").val();
+			var fecha2 = $("#hasta").val();
+			if (fecha1 && fecha2) {
+				cargando(1);
+				$.ajax({
+					url:"/qr_code/"+"escaner/buscar",
+					data:{desde:fecha1,hasta:fecha2},
+					type:"post",
+					success:function(r)
+					{
+						cargando(0);
+						if (r) {
+							$("#lista-registros").html(r);
+						}else{
+							alert("No se encontraron resultados");
+						}
+					}
+				})
+			};
+		});
+
+		$("body").on("click","#btn-buscar-todo",function(){
+			getRegistrosTodos();
+		})
+
+	})
+
+
+
+
+Number.prototype.padLeft = function(base,chr){
+	var  len = (String(base || 10).length - String(this).length)+1;
+	return len > 0? new Array(len).join(chr || '0')+this : this;
+}
+function getDateFormated(){
+	    var d = new Date,
+        dformat = [ (d.getMonth()+1).padLeft(),
+                    d.getDate().padLeft(),
+                    d.getFullYear()].join('-')+
+                    ' ' +
+                  [ d.getHours().padLeft(),
+                    d.getMinutes().padLeft(),
+                    d.getSeconds().padLeft()].join(':');
+        return dformat;
+}
+function guardar(string,fecha){
+	cargando(1);
+	$.ajax({
+		url:"/qr_code/"+"escaner/crear",
+		data:{codigo:string,fecha:fecha},
+		type:"post",
+		dataType:'json',
+		async:false,
+		success:function(r){
+			console.log(r)
+			cargando(0);
+
+			if (r.response) {
+
+				var fila = '<tr><td>'+string+'</td><td>'+fecha+'</td><td id="'+r.id+'" class="boton_borrar">Borrar</span></td></tr>';
+				agregarFila(fila);
+			}else{
+				alert("Ocurrio un error guardando el registro");
+			}
+		}
+	})
+}
+function agregarFila(htmlcode){
+	$("#lista-registros").prepend(htmlcode);
+}
+function getRegistros(){
+	cargando(1);
+
+	$.ajax({
+		url:"/qr_code/"+"escaner/",
+		success:function(r){
+			cargando(0);
+
+			$("#lista-registros").append(r);
+		}
+	})
+}
+function getRegistrosTodos(){
+	cargando(1);
+
+	$.ajax({
+		url:"/qr_code/"+"escaner/",
+		success:function(r){
+			cargando(0);
+
+			$("#lista-registros").html(r);
+		}
+	})
+}
+function cargando(bool){
+	if (bool) {
+		$(".cargando").css("display","block");
+
+	}else{
+		$(".cargando").css("display","none");
+	}
+}
+</script>
+<style type="text/css">
+	.boton_borrar{
+		background-color: #E84848;
+	}
+	.boton_borrar:hover{
+		cursor: pointer;
+		background-color: #C11919;
+	}
+	#div_tabla{
+		height:600px;
+		overflow: scroll;
+	}
+</style>
+<div id="page-wrapper">
+	<div class="row">
+		<?php View::content() ?>
+		<center>
+		<h1>Sistema lector de Códigos Qr</h1>
+
+		</center>
+		<div class="col-lg-6">
+		<div class="cargando"><h3>Cargando...</h3></div>
+			<hr>
+			<div class="row">
+				<div class="col-md-3"><input type="text" placeholder="Desde" id="desde" class="form-control datepicker"></div>
+				<div class="col-md-3"><input type="text" placeholder="Hasta" id="hasta" class="form-control datepicker"></div>
+				<div class="col-md-6"><input type="submit" value="Buscar" id="btn-buscar" class="btn btn-default"> &nbsp;<input type="submit" value="Cargar Todo" id="btn-buscar-todo" class="btn btn-default"></div>
+
+			</div>
+			<hr>
+			<div id="reader" style="width:100%;height:250px"></div>
+			<hr>
+			<div class="boton-exportar">
+				<?php echo Html::link("escaner/exportar?","Exportar en Excel",'class="btn btn-default" id="btn-exportar" target="_blank"') ?>
+			</div>
+		</div>
+		<div class="col-lg-6" id="div_tabla">
+			<table class="table datatable" id="lista-registros">
+				<thead>
+					<th>Codigo</th>
+					<th>Fecha</th>
+					<th>Acción</th>
+				</thead>
+			</table>
+		</div>
+	</div>
+</div>

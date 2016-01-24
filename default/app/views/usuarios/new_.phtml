@@ -1,0 +1,73 @@
+
+<script type="text/javascript">
+$(document).ready(function(){
+	var availableTags;
+	$.ajax({
+		url:"../index/get_empresas",
+		async:false,
+		success:function(r){
+			availableTags = r;
+			console.log(availableTags)
+
+		}
+	})
+	var box = $("#tags");
+	box.autocomplete({
+		source: availableTags
+	});
+})
+</script>
+<div id="page-wrapper">
+	<div class="row">	
+		<h1>Dar de Alta a un Usuario</h1>
+		<?php View::content() ?>
+			<div class="col-lg-6">
+				<?php echo Form::open("index/newuser","post",'role="form"') ?>
+				<div class="form-group">
+					<label>Nombre de Usuario</label>
+					<input class="form-control" required="required" type='text' name="usuarios[nombre]" placeholder="Nombre de Usuario">
+					<p class="help-block">Escribe el Nombre de Usuario</p>
+				</div>
+				<div class="form-group">
+					<label>Password</label>
+					<input class="form-control" required="required" type='password' name="usuarios[clave]" placeholder="Password">
+					<p class="help-block">Escribe la clave del usuario</p>
+				</div>
+				<div class="form-group">
+					<label>Repetir la Password</label>
+					<input class="form-control" required="required" type='password' name="usuarios[clave2]" placeholder="Repetir-Password">
+					<p class="help-block">Repetir la Password</p>
+				</div>
+				<div class="form-group">
+					<label>Empresa</label>
+					<input class="form-control" required="required" type='text' name="usuarios[empresa]" id="tags" placeholder="Empresa">
+					<p class="help-block">Escribe la Empresa, Puede que si coloca una letra aparezca una ayuda...</p>
+				</div>
+				<div class="form-group">
+					<label>Email</label>
+					<input class="form-control" required="required" type='email' name="usuarios[email]" id="tags" placeholder="Email">
+					<p class="help-block">Escribe el email para a futuro enviar correos automaticos</p>
+				</div>
+				<div class="form-group">
+					<label>Role</label>
+					<select name="usuarios[rol]" class="form-control" id="">
+						<option value="C">Seleccione un Role</option>
+						<option value="C">Operador Externo</option>
+						<option value="I">Operador Interno</option>
+						<option value="U">Cliente</option>
+						<option value="A">Administrador</option>
+					</select>
+					<p class="help-block">Selecciona un role de usuario</p>
+				</div>
+				<button type="submit" class="btn btn-default">Agregar Usuario</button>
+<br>
+<br>
+			</form>
+		</div>	
+	</div>
+</div>
+<?php echo Tag::css("jquery-ui") ?>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+
+
+<?php echo Tag::js("jquery/jquery-ui") ?>

@@ -1,0 +1,75 @@
+<div id="page-wrapper">
+	<div class="row">
+		<?php View::content() ?>
+		<div class="col-lg-6" style="height:800px;overflow-y:scroll">
+		<h1>Ver Contrato</h1>
+		<?php echo Html::link("contratos/","Ir Atras") ?>
+			<div class="panel panel-default">
+			  <!-- Default panel contents -->
+			  <div class="panel-heading">Id de Contrato # <?php echo $documento->contratos_id ?></div>
+			  <div class="panel-body">
+			    <p>
+			    	<a href="<?php echo PUBLIC_PATH.$documento->url ?>">Ver</a>
+			    	<hr>
+			    	<embed src="<?php echo PUBLIC_PATH.$documento->url ?>" width="100%" height="375">
+			    </p>
+			  </div>
+
+			  <!-- List group -->
+			  <ul class="list-group">
+			  	<?php $contrato = Load::model("contratos")->find($documento->contratos_id) ?>
+			  	<?php $subido_por = Load::model("usuarios")->get_nombre_by_id($contrato->pertenece_a); ?>
+			    <li class="list-group-item">Subido por <?php echo $subido_por ?></li>
+			    <li class="list-group-item">Numero de Preforma: <?php echo $contrato->numero_preforma ?></li>
+			    <li class="list-group-item">Tipo de documento: <?php echo Load::model("tipos")->get_tipo_by_id($documento->tipo_documento) ?></li>
+			    <li class="list-group-item">Creado <?php echo $documento->created ?></li>
+			  </ul>
+			</div>
+		</div>
+		<div class="col-lg-6" style="height:800px;overflow-y:scroll">
+			<h1>Documentos</h1>
+			<br>
+			<div class="panel panel-default">
+			  <!-- Default panel contents -->
+			  <div class="panel-heading">Documentos Registrados</div>
+			  <div class="panel-body">
+			  
+			  </div>
+
+			  <!-- List group -->
+			  <ul class="list-group">
+			  	<?php $documentos_de_contrato = Load::model("documentos")->find("conditions: contratos_id='{$documento->contratos_id}' and tipo_documento != '1' ") ?>
+			  	<?php if ($documentos_de_contrato): ?>
+				  	<?php foreach ($documentos_de_contrato as $key => $value): ?>
+				    	<li class="list-group-item">
+				    		<table width="100%">
+				    			<tr>
+				    				<td>
+						    		<?php $tipo = Load::model("tipos")->get_tipo_by_id($value->tipo_documento) ?>
+						    		<b>Tipo de Documento:</b></td><td> <?php echo $tipo ?> </td>
+				    			</tr>
+				    			<tr>
+						    		<td><b>Creado:</b></td><td> <?php echo $value->created ?> </td>
+						    	</tr>
+						    	<tr>
+						    		<td colspan="2" class="center">
+						   
+						    			<a href="<?php echo PUBLIC_PATH.$value->url ?>">Ver...</a>
+						    		</td>
+						    	</tr>
+						    	<tr>
+						    		<td colspan="2"><embed src="<?php echo PUBLIC_PATH.$value->url ?>" width="100%" height="375"></td>
+						    	</tr>
+				    		</table>
+				    	</li>
+				  	<?php endforeach ?>
+			  	<?php else: ?>
+			  		<center>
+			  			<h3>No ha subido Documentos</h3>
+			  		</center>
+			  	<?php endif ?>
+			  </ul>
+			</div>
+		</div>
+	</div>
+</div>

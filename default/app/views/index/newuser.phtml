@@ -1,0 +1,59 @@
+    <div class="container">
+<?php echo Tag::css("jquery-ui") ?>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+
+<?php echo Tag::js("jquery/jquery.min") ?>
+<?php echo Tag::js("jquery/jquery-ui") ?>
+<script type="text/javascript">
+$(document).ready(function(){
+	var availableTags;
+  	$.ajax({
+  		url:"get_empresas",
+  		async:false,
+  		success:function(r){
+  			availableTags = r;
+  			console.log(availableTags)
+
+  		}
+  	})
+    var box = $("#tags");
+  	box.autocomplete({
+      	source: availableTags
+    });
+})
+</script>
+    <?php View::content() ?>
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4">
+                <div class="login-panel panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Por favor Registrese</h3>
+                    </div>
+                    <div class="panel-body">
+						<?php echo Form::open("","POST",'role="form"') ?>
+                            <fieldset>
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="Nombre de Usuario" name="usuarios[nombre]" type="text" autofocus>
+                                </div>
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="Contraseña" name="usuarios[clave]" type="password" value="">
+                                </div>
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="Repetir-Contraseña" name="usuarios[clave2]" type="password" value="">
+                                </div>
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="Empresa" name="usuarios[empresa]" id="tags" type="text" value="">
+                                </div>
+                              
+                                <!-- Change this to a button or input when using this as a form -->
+                                <?php echo Form::submit("Crear",'class="btn btn-lg btn-success btn-block"') ?>
+                                <hr>
+                                <?php echo Html::link("index/login","Pagina de Autenticación","class='btn btn-default'") ?>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
